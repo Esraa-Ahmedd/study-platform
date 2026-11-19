@@ -35,7 +35,9 @@ const user=await this.prismaService.user.create({
       },
     });
 
-    return user;
+ return {
+  message: 'Account created successfully'
+ }
   }
 
 
