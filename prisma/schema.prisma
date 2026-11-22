@@ -11,16 +11,80 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
-enum Role{
-  STUDENT
+
+enum Role {
   PARENT
+  STUDENT
 }
+
+
+enum LinkStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  REVOKED
+}
+
 model User {
-  id Int @id @default(autoincrement())
-  first_name String
-  last_name  String
-  email String @unique
-  password String
-  age Int
-  role Role @default(STUDENT)
+  id                  Int           @id @default(autoincrement())
+  first_name          String
+  last_name           String
+  age                 Int?
+  email               String        @unique
+  password            String
+  role                Role
+
+  created_at          DateTime      @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  parentLinks         ParentStudent[] @relation("ParentLinks")
+  studentLinks        ParentStudent[] @relation("StudentLinks")
+
+  sessions            RefreshSession[]
+ 
+  generatedCodes      LinkingCode[] @relation("GeneratedCodes")
+}
+
+model ParentStudent {
+  id          Int        @id @default(autoincrement())
+  parent_id   Int
+  student_id  Int
+  status      LinkStatus @default(PENDING)
+
+  created_at  DateTime   @default(now())
+ updated_at DateTime @default(now()) @updatedAt
+
+  parent      User       @relation("ParentLinks", fields: [parent_id], references: [id], onDelete: Cascade)
+  student     User       @relation("StudentLinks", fields: [student_id], references: [id], onDelete: Cascade)
+
+  @@unique([parent_id, student_id])
+  @@index([parent_id, status])
+  @@index([student_id, status])
+}
+
+model RefreshSession {
+  id          Int    @id @default(autoincrement())
+  user_id     Int
+  token_hash  String   @unique
+  expires_at  DateTime
+  revoked_at  DateTime?
+  created_at  DateTime @default(now())
+
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+}
+
+
+model LinkingCode {
+  id          String   @id @default(uuid())
+  student_id  Int
+  code_hash   String   @unique
+  expires_at  DateTime
+  used_at     DateTime?
+  created_at  DateTime @default(now())
+
+  student     User     @relation("GeneratedCodes", fields: [student_id], references: [id], onDelete: Cascade)
+
+  @@index([student_id])
 }
