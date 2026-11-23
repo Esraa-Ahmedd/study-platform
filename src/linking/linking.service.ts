@@ -11,7 +11,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service.js';
 import { Role, LinkStatus } from '../generated/prisma/client.js';
 
-import { randomBytes, createHash } from 'node:crypto';
+import { randomInt, createHash } from 'node:crypto';
 import { LinkStudentDto } from './dto/link-student.dto.js';
 
 @Injectable()
@@ -23,14 +23,14 @@ export class LinkingService {
     return createHash('sha256').update(code).digest('hex');
   }
 
-  // Generate a random 16-character code
+   // Generate a random 6-digit code
   private generateCode(): string {
-    return randomBytes(8).toString('hex');
+      return randomInt(0, 1_000_000).toString().padStart(6, '0');
   }
 
-  // Code expires after 15 minutes
+  // Code expires after 2 minutes
   private getCodeExpiry(): Date {
-    return new Date(Date.now() + 15 * 60 * 1000);
+    return new Date(Date.now() + 2 * 60 * 1000);
   }
 
   // STUDENT: Generate linking code
@@ -51,8 +51,17 @@ export class LinkingService {
       throw new ForbiddenException('Only students can generate linking codes');
     }
 
-    const code = this.generateCode();
-    const codeHash = this.hashCode(code);
+  let code: string;
+let codeHash: string;
+
+do {
+  code = this.generateCode();
+  codeHash = this.hashCode(code);
+} while (
+  await this.prismaService.linkingCode.findUnique({
+    where: { code_hash: codeHash },
+  })
+);
     const expiresAt = this.getCodeExpiry();
     const now = new Date();
 

@@ -10,7 +10,7 @@ import { AppService } from './app.service.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { UsersModule } from './users/users.module.js';
 import { AuthModule } from './auth/auth.module.js';
-
+import { ThrottlerModule } from '@nestjs/throttler';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from './auth/guards/roles.guard.js';
 import { LinkingModule } from './linking/linking.module.js';
@@ -21,7 +21,12 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
+   ThrottlerModule.forRoot([
+      {
+        ttl: 900000,
+        limit: 5,
+      },
+    ]),
     PrismaModule,
     UsersModule,
     AuthModule,
@@ -43,6 +48,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       useClass: RolesGuard,
     },
   ],
+
 })
 export class AppModule {}
 

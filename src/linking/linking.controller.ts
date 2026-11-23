@@ -3,7 +3,13 @@ import {
   Body,
   Controller,
   Post,
+  UseGuards,
 } from '@nestjs/common';
+
+import {
+  Throttle,
+  ThrottlerGuard,
+} from '@nestjs/throttler';
 
 import { LinkingService } from './linking.service.js';
 import { LinkStudentDto } from './dto/link-student.dto.js';
@@ -27,7 +33,14 @@ export class LinkingController {
   // PARENT: Link student using code
   @Roles(Role.PARENT)
   @Post('link-child')
-  linkChild(
+  @UseGuards(ThrottlerGuard)
+  @Throttle({
+    default: {
+      limit: 5,
+      ttl: 900000,
+    },
+  })
+  linkStudent(
     @CurrentUser() user: { id: number },
     @Body() dto: LinkStudentDto,
   ) {

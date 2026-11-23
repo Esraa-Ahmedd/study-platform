@@ -1,8 +1,9 @@
-import { IsString, Length, Matches } from 'class-validator';
+import { IsString, Matches } from 'class-validator';
 
 export class LinkStudentDto {
   @IsString()
-  @Length(16, 16)
-  @Matches(/^[a-fA-F0-9]+$/)
+  @Matches(/^\d{6}$/, {
+    message: 'Code must be exactly 6 digits',
+  })
   code: string;
 }

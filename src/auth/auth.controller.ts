@@ -36,28 +36,6 @@ return this.authService.login(loginDto)
   currentUser(@CurrentUser() user: { id: number }) {
     return this.authService.getCurrentuser(user.id);
   }
-   // PARENT TEST ROUTE
-
-  @Roles(Role.PARENT)
-  @Get('parent-test')
-  parentTest(@CurrentUser() user: { id: number }) {
-    return {
-      message: 'Parent access success',
-      userId: user.id,
-    };
-  }
-   @Roles(Role.STUDENT)
-  @Get('student-test')
-  studentTest(@CurrentUser() user: { id: number }) {
-    return {
-      message: 'Student access success',
-      userId: user.id,
-    };
-  }
-
-
-
-
 
 
 // CHANGE PASSWORD
