@@ -54,22 +54,12 @@ return this.authService.login(loginDto)
       userId: user.id,
     };
   }
-  // REFRESH TOKEN
-
-@Public()
-@Post('refresh')
-refresh(@Body('refresh_token') refreshToken: string) {
-  return this.authService.refresh(refreshToken);
-}
 
 
-// LOGOUT
 
-@Public()
-@Post('logout')
-logout(@Body('refresh_token') refreshToken: string) {
-  return this.authService.logout(refreshToken);
-}
+
+
+
 // CHANGE PASSWORD
 
 @Post('change-password')
