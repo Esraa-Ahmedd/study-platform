@@ -97,7 +97,7 @@ do {
 
   // PARENT: Link student using code
   async linkStudent(parentId: number, dto: LinkStudentDto) {
-    const code = dto.code.trim().toLowerCase();
+    const code = dto.code;
     const codeHash = this.hashCode(code);
     const now = new Date();
 
